@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Selector de asignaturas</title>
+<style>
+:root{--bg:#fbf8f5;--cd:#fff;--tx:#2b2522;--mu:#8a7f79;--ac:#e9826a;--ln:#eadfd8;--ok:#3f9d62;--bad:#d5483f;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1c1917;--cd:#26211f;--tx:#f1ebe7;--mu:#a29893;--ac:#f0977f;--ln:#3a3330;--ok:#5cc184;--bad:#f06a60}}
+:root[data-theme="dark"]{--bg:#1c1917;--cd:#26211f;--tx:#f1ebe7;--mu:#a29893;--ac:#f0977f;--ln:#3a3330;--ok:#5cc184;--bad:#f06a60}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:Georgia,serif;font-size:15px}
+main{max-width:760px;margin:0 auto;padding:18px 14px 40px}
+h1{font-size:1.4rem;margin:0 0 2px}.sub{color:var(--mu);font-size:.85rem;margin-bottom:12px}
+.card{background:var(--cd);border:1px solid var(--ln);border-radius:10px;padding:12px 14px;margin-bottom:14px}
+h2{margin:0 0 8px;font-size:.95rem;color:var(--ac);letter-spacing:.1em;text-transform:uppercase}
+.stats{display:flex;gap:10px;flex-wrap:wrap}.stats div{flex:1;min-width:90px}.stats b{display:block;font-size:1.3rem}.stats span{color:var(--mu);font-size:.75rem}
+.bar{height:8px;background:var(--ln);border-radius:4px;overflow:hidden;margin:10px 0 0}.bar i{display:block;height:100%;background:var(--ac)}
+input[type=number]{width:60px;padding:4px 6px;border:1px solid var(--ln);border-radius:6px;background:var(--bg);color:var(--tx);font:inherit}
+.r{display:flex;gap:8px;align-items:center;padding:6px 0;border-bottom:1px dotted var(--ln)}.r:last-child{border:0}
+.r .n{flex:1}.r small{display:block;color:var(--mu);font-size:.72rem}
+.cd{font-family:ui-monospace,monospace;font-size:.72rem;color:var(--mu);min-width:62px}
+.tag{font-size:.68rem;padding:2px 7px;border-radius:10px;background:var(--ln);white-space:nowrap}.tag.f{background:var(--bad);color:#fff}
+.st{width:30px;height:30px;border-radius:8px;border:1.5px solid var(--ln);background:var(--bg);color:var(--tx);font-size:1rem;flex:none;cursor:pointer}
+.ok .st{background:var(--ok);border-color:var(--ok);color:#fff}.fail .st{background:var(--bad);border-color:var(--bad);color:#fff}
+.blk .n,.blk .cd{opacity:.5}
+.ok .n b{text-decoration:line-through;color:var(--mu);font-weight:normal}
+.hint{color:var(--mu);font-size:.8rem;margin:0 0 8px}
+details summary{cursor:pointer;color:var(--ac)}
+button.rs{margin-top:8px;background:none;border:1px solid var(--ln);color:var(--mu);border-radius:6px;padding:4px 10px;font:inherit;font-size:.8rem}
+</style></head><body><main>
+<h1>Selector de asignaturas</h1>
+<div class="sub">Arquitectura y Urbanismo (pensum 102). Toca el cuadro de cada materia: 1 toque = aprobada ✓, 2 = reprobada ✗, 3 = pendiente.</div>
+<div class="card"><div class="stats" id="st"></div><div class="bar"><i id="pb"></i></div>
+<p class="hint" style="margin-top:10px">Créditos máximos por cuatrimestre: <input type="number" id="cap" value="21" min="1" max="30"></p></div>
+<div class="card"><h2>Para el próximo cuatrimestre</h2><div id="rec"></div></div>
+<div class="card"><details><summary>Ver proyección hasta graduarte</summary><div id="proj" style="margin-top:8px"></div></details></div>
+<div id="per"></div>
+<button class="rs" id="rs">Reiniciar todo</button>
+</main>
+<script>
+const R=`P1
+ORI-100|Orientación Universitaria|1||
+HUM-150|Historia de la Cultura Universal|3||
+LET-104|Expresión Oral y Producción Escrita|3||
+MAT-060|Matemática Básica|4||
+600|Introducción a la Carrera de Arquitectura|1||
+601|Diseño I|3||
+700|Panorama de las Artes|2||700-L
+700-L|Taller de Producción Artística|1||700
+701|Geometría Descriptiva I|3||
+P2
+MAT-170|Cálculo Diferencial e Integral I|3|MAT-060|
+ELT-001|Electiva I (Artes y Deportes)|1||
+HUM-160|Historia Dominicana|3||
+602|Diseño II|3|601|
+702|Geometría Descriptiva II|3|701|
+703|Composición|2|601|703-L
+703-L|Laboratorio de Composición|1|601|703
+704|Representación Arquitectónica|3|700 701|
+705|Dibujo Digital|2|701|
+P3
+SOC-100|Introducción a la Sociología|3||
+FIS-011|Física Básica I|3||FIS-011-L
+FIS-011-L|Física Básica I Práctica|1||FIS-011
+603|Diseño III|3|602 ORI-100 600 704|
+706|Modelado Digital|2|702 705|
+707|Fabricación Digital I|2|703|
+400|Interpretación Arquitectónica y su Entorno|2|HUM-150 700|
+232|Métodos y Técnicas de Investigación I|2|LET-104|
+ING-210|Topografía|3|704|
+P4
+604|Diseño IV|4|603 705 703|
+404|Metodología del Diseño|3|232|
+708|Presentación Digital|2|704 706|
+800|Sociología Urbana|3|SOC-100|
+401|Historia del Arte y la Arquitectura I|3|400|
+570|Fundamentos Estructurales I|3|FIS-011 FIS-011-L MAT-170|
+LEX-110|Inglés Básico|3||
+P5
+605|Diseño V|4|604|
+709|Introducción al BIM|2|ING-210|
+801|Urbanismo|3|400|
+402|Historia del Arte y la Arquitectura II|3|401|
+581|Materiales y Métodos de Construcción I|3|603|
+ADM-105|Principios de Administración|3||
+571|Fundamentos Estructurales II|3|570|
+P6
+606|Diseño VI|4|605 708 404|
+802|Diseño Urbano I|3|800 801|
+403|Historia del Arte y la Arquitectura III|3|402|
+582|Materiales y Métodos de Construcción II|3|581|
+572|Intro. al Diseño de Estructuras de Concreto Armado y Mampostería|3|571|
+584|Instalación Eléctrica|3|604|
+RNA-100|Conciencia Medioambiental|1||
+P7
+607|Diseño VII|5|606 802|
+620|Arquitectura Bioclimática|3|RNA-100 605|
+405|Historia de la Arquitectura Dominicana|3|HUM-160 402|
+583|Materiales y Métodos de Construcción III|3|582|
+585|Instalaciones Sanitarias|3|604|
+573|Intro. al Diseño de Estructuras de Acero Estructural y Modelado|3|571|
+P8
+608|Diseño VIII|6|607 572 573 709 581|
+803|Arquitectura del Paisaje|3|802|
+521|Administración y Organización de Obras I|3|582 ADM-105 709|
+586|Sistemas y Equipamientos en Edificaciones|3|620|
+LEX-221|Inglés Técnico para Arquitectos|3|LEX-110|
+ELT-002|Electiva II|3|232 606 707 709|
+P9
+609|Diseño IX|6|608 584 585 586|
+622|Proyecto Inmobiliario|2|521|
+621|Diseño de Interiores|3|606 583|
+406|Teorías de la Arquitectura I|3|400|
+522|Administración y Organización de Obras II|3|521|
+ELT-003|Electiva III|3|232 606 707 709 802|
+P10
+610|Diseño X|6|609 621|
+804|Diseño Urbano II|3|802|
+901|Formulación de Proyecto de Grado|3|609 LEX-221|
+407|Teorías de la Arquitectura II|3|406|
+ELT-004|Electiva IV|3|232 405 606 620 707 709 802|
+P11
+902|Pre-Proyecto de Grado|6|610 901|
+415|Gerencia y Práctica Profesional|3|522|
+ADM-144|Emprendimiento|3|ADM-105|
+ELT-005|Electiva V|3|232 405 521 584 606 620 707 709 802 803|
+P12
+903|Proyecto de Grado|6|902|
+ELT-006|Electiva VI|3|232 405 406 521 522 584 606 620 707 709 802 803|`;
+const n=c=>/^\d/.test(c)?"ARQ-"+c:c;
+const EO={};
+`ART-102|Apreciación de teatro|
+ART-105|Coro|
+ART-106|Ballet Folklórico|
+ART-110|Ballet Danza Jazz|
+ART-111|Guitarra|
+ART-113|Guitarra Avanzada|
+EDF-101|Ajedrez|
+EDF-102|Arquería|
+EDF-103|Atletismo|
+EDF-104|Baloncesto|
+EDF-105|Rugby|
+EDF-106|Béisbol|
+EDF-225|Fútbol Sala|
+EDF-226|Fútbol Campo|
+EDF-112|Judo|
+EDF-113|Karate|
+EDF-119|Taekwondo|
+EDF-220|Tenis de Campo|
+EDF-221|Tenis de Mesa|
+EDF-222|Voleibol|
+416|Teórica: Crítica de la Arquitectura Contemporánea|406
+417|Teórica: Investigación e Innovación Proyectual|232 707 709
+418|Teórica: Conservación de Bienes Edificados|405
+587|Tecnología de la Construcción: Supervisión y Dirección de Obras|522
+588|Tecnología de la Construcción: Introducción a la Gestión de Proyectos|521
+623|Diseño: Vivienda Colectiva Contemporánea|606
+624|Diseño: Gestión de Riesgos al Cambio Climático|802 620
+625|Diseño: Diseño, Arquitectura y Sostenibilidad|606
+626|Diseño: Diseño de Iluminación y Acústica|584
+627|Diseño: Paisajismo|803
+710|Arte: Fabricación Digital II|707
+711|Arte: Exploración del Espacio Cinemático|606
+712|Arte: Arquitectura Algorítmica Paramétrica-Generativa|606
+713|Arte: Realidad Virtual y Arquitectura|606
+714|Arte: Arte y Ciudad|803
+806|Urbanas: Género, Arquitectura y Urbanismo|802
+807|Urbanas: Territorio y Metrópolis|802
+808|Urbanas: Sistemas de Información Geográfica para Arquitectos|802`.split("\n").forEach(l=>{const[a,b,c]=l.split("|");EO[n(a)]={nm:b,pre:c?c.split(" ").map(n):[]}});
+const ES={"ELT-001":"ART-102 ART-105 ART-106 ART-110 ART-111 ART-113 EDF-101 EDF-102 EDF-103 EDF-104 EDF-105 EDF-106 EDF-225 EDF-226 EDF-112 EDF-113 EDF-119 EDF-220 EDF-221 EDF-222","ELT-002":"417 623 625 710 711 712 713","ELT-003":"417 623 625 710 711 712 713 806 807 808","ELT-004":"417 418 623 624 625 710 711 712 713 806 807 808","ELT-005":"417 418 588 623 624 625 626 627 710 711 712 713 714 806 807 808","ELT-006":"416 417 418 587 588 623 624 625 626 627 710 711 712 713 714 806 807 808"};
+Object.keys(ES).forEach(k=>ES[k]=ES[k].split(" ").map(n));
+let DN=new Set();
+const used=k=>Object.keys(ES).filter(x=>x!=k&&S["e:"+x]).map(x=>S["e:"+x]);
+const opts=(k,d)=>ES[k].filter(o=>EO[o].pre.every(q=>d.has(q))&&!used(k).includes(o));
+const eo=k=>{const o=opts(k,DN).map(x=>EO[x].nm);return `<small>Opciones: ${o.slice(0,5).join("; ")}${o.length>5?" y "+(o.length-5)+" más":""}</small>`};
+const sel=k=>{const cur=S["e:"+k]||"",u=used(k);return `<select data-e="${k}" style="margin-top:4px;max-width:100%;background:var(--bg);color:var(--tx);border:1px solid var(--ln);border-radius:6px;font:inherit;font-size:.78rem"><option value="">¿Cuál electiva?</option>${ES[k].filter(o=>!u.includes(o)).map(o=>`<option value="${o}"${o==cur?" selected":""}${EO[o].pre.every(q=>DN.has(q))||o==cur?"":" disabled"}>${o} ${EO[o].nm}</option>`).join("")}</select>`};
+const C={},O=[];let p=0;
+R.split("\n").forEach(l=>{if(/^P\d+$/.test(l)){p=+l.slice(1);return}
+const[a,b,cr,pr,co]=l.split("|");const k=n(a);
+C[k]={k,nm:b,cr:+cr,p,pre:pr?pr.split(" ").map(n):[],co:co?co.split(" ").map(n):[],ch:[]};O.push(k)});
+O.forEach(k=>C[k].pre.forEach(q=>C[q].ch.push(k)));
+const dep={},NA={};
+function D(k){if(k in dep)return dep[k];return dep[k]=C[k].ch.length?1+Math.max(...C[k].ch.map(D)):0}
+function A(k,s){C[k].ch.forEach(x=>{if(!s.has(x)){s.add(x);A(x,s)}});return s}
+O.forEach(k=>{D(k);NA[k]=A(k,new Set()).size});
+let S={};try{S=JSON.parse(localStorage.getItem("sel102")||"{}")}catch(e){}
+const $=id=>document.getElementById(id);
+const sc=k=>dep[k]*100+NA[k]+(S[k]=="fail"?50:0);
+function pick(done,cap){
+const av=O.filter(k=>!done.has(k)&&C[k].pre.every(q=>done.has(q))&&(!ES[k]||opts(k,done).length)).sort((a,b)=>sc(b)-sc(a));
+const sel=[];let t=0;
+for(const k of av){if(sel.includes(k))continue;
+const g=[k];C[k].co.forEach(q=>{if(!done.has(q)&&!sel.includes(q))g.push(q)});
+if(g.some(q=>!av.includes(q)))continue;
+const cr=g.reduce((s,q)=>s+C[q].cr,0);
+if(t+cr<=cap){sel.push(...g);t+=cr}}
+return sel}
+const row=(k,extra)=>{const c=C[k],f=S[k]=="fail";
+return `<div class="r"><span class="cd">${k}</span><div class="n">${c.nm}<small>${c.cr} créd.${NA[k]?" · desbloquea "+NA[k]+" materia"+(NA[k]>1?"s":""):""}</small>${ES[k]?eo(k):""}</div>${f?'<span class="tag f">Repetir</span>':""}</div>`};
+function render(){
+const cap=Math.max(1,+$("cap").value||21);
+const done=new Set(O.filter(k=>S[k]=="ok"));
+const tot=O.reduce((s,k)=>s+C[k].cr,0),dc=[...done].reduce((s,k)=>s+C[k].cr,0);
+DN=done;const rec=pick(done,cap);
+const d2=new Set(done),terms=[];
+while(d2.size<O.length&&terms.length<24){const s=pick(d2,cap);if(!s.length)break;terms.push(s);s.forEach(x=>d2.add(x))}
+$("st").innerHTML=`<div><b>${dc}/${tot}</b><span>créditos aprobados</span></div><div><b>${done.size}/${O.length}</b><span>materias</span></div><div><b>${d2.size==O.length?terms.length:"—"}</b><span>cuatrimestres restantes</span></div>`;
+$("pb").style.width=dc/tot*100+"%";
+$("rec").innerHTML=rec.length?`<p class="hint">Orden por prioridad: primero lo que más materias desbloquea y lo que reprobaste. Total: <b>${rec.reduce((s,k)=>s+C[k].cr,0)}</b> créditos.</p>`+rec.map(k=>row(k)).join(""):"<p class=hint>No hay materias disponibles o ya terminaste.</p>";
+$("proj").innerHTML=terms.map((t,i)=>`<p class="hint"><b>Cuatrimestre ${i+1}</b> (${t.reduce((s,k)=>s+C[k].cr,0)} créd.): ${t.map(k=>k+" "+C[k].nm).join("; ")}</p>`).join("")+(d2.size<O.length?"<p class=hint>Algunas materias no se pudieron programar.</p>":"<p class=hint>Supone que apruebas todo lo planificado.</p>");
+let h="";for(let i=1;i<=12;i++){h+=`<div class="card"><h2>Período ${i}</h2>`;
+O.filter(k=>C[k].p==i).forEach(k=>{const c=C[k],s=S[k]||"",miss=c.pre.filter(q=>!done.has(q));
+h+=`<div class="r ${s} ${!s&&miss.length?"blk":""}"><button class="st" data-k="${k}">${s=="ok"?"✓":s=="fail"?"✗":""}</button><span class="cd">${k}</span><div class="n"><b>${c.nm}</b><small>${c.cr} créd.${miss.length&&s!="ok"?" · falta: "+miss.join(", "):""}${c.co.length?" · correq.: "+c.co.join(", "):""}${s=="fail"&&NA[k]?" · bloquea "+NA[k]+" materias":""}</small>${ES[k]?sel(k):""}</div></div>`});
+h+="</div>"}
+$("per").innerHTML=h}
+$("per").addEventListener("click",e=>{const b=e.target.closest("[data-k]");if(!b)return;const k=b.dataset.k,s=S[k];
+S[k]=!s?"ok":s=="ok"?"fail":"";if(!S[k])delete S[k];
+try{localStorage.setItem("sel102",JSON.stringify(S))}catch(x){}render()});
+$("per").addEventListener("change",e=>{const k=e.target.dataset.e;if(!k)return;if(e.target.value)S["e:"+k]=e.target.value;else delete S["e:"+k];try{localStorage.setItem("sel102",JSON.stringify(S))}catch(x){}render()});
+$("cap").addEventListener("input",render);
+$("rs").onclick=()=>{S={};try{localStorage.removeItem("sel102")}catch(x){}render()};
+render();
+</script></body></html>
